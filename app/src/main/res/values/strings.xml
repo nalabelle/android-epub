@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AndroidEpub</string>
+    <string name="settings_title">Settings</string>
+    <string name="action_settings">Settings</string>
+    
+    <!-- Main screen -->
+    <string name="paste_url_hint">Paste URL here</string>
+    <string name="create_epub_button">Create EPUB</string>
+    <string name="select_output_folder">Select Output Folder</string>
+    
+    <!-- Settings screen -->
+    <string name="storage_location_title">EPUB Storage Location</string>
+    <string name="storage_location_summary">Choose where to save your EPUB files</string>
+    <string name="select_folder">Select Folder</string>
+    <string name="epub_options_category">EPUB Options</string>
+    <string name="include_images_title">Include Images</string>
+    <string name="include_images_summary">Download and include images in the EPUB</string>
+    <string name="default_author_title">Default Author</string>
+    <string name="default_author_summary">Author name to use when not available</string>
+    
+    <!-- Messages -->
+    <string name="error_invalid_url">Invalid URL. Please enter a valid URL.</string>
+    <string name="error_failed_download">Failed to download content.</string>
+    <string name="error_epub_creation">Failed to create EPUB.</string>
+    <string name="success_epub_created">EPUB created successfully!</string>
+    <string name="error_no_output_folder">Please select an output folder first.</string>
+    <string name="success_folder_selected">Output folder selected successfully!</string>
+    <string name="select_output_folder_prompt">Please select a folder to save your EPUB.</string>
+
+    <!-- Folder Selection Dialog -->
+    <string name="folder_explanation_title">Select Output Folder</string>
+    <string name="folder_explanation_content">To save your EPUB files securely, we need you to select a folder where they will be stored. This gives you control over where your files are saved and ensures we only access the location you choose.
+
+Once selected, all EPUB files created by the app will be saved to this folder. You can change this location at any time in the app settings.</string>
+    <string name="folder_explanation_select">Select Folder</string>
+    <string name="folder_explanation_later">Later</string>
+
+    <!-- No Folder Selected Screen -->
+    <string name="no_folder_title">Select a Folder to Save EPUBs</string>
+    <string name="no_folder_description">Before creating EPUBs, please select a folder where you would like them to be saved. This helps keep your files organized and ensures we only access the locations you choose.</string>
+
+    <!-- EPUB History Item -->
+    <string name="open_epub">Open</string>
+</resources>

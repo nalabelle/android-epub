@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:title="Storage Settings"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            android:key="storage_location"
+            android:title="@string/storage_location_title"
+            android:summary="@string/storage_location_summary"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/epub_options_category"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreferenceCompat
+            android:key="include_images"
+            android:title="@string/include_images_title"
+            android:summary="@string/include_images_summary"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <EditTextPreference
+            android:key="default_author"
+            android:title="@string/default_author_title"
+            android:summary="@string/default_author_summary"
+            android:defaultValue="Unknown Author"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
