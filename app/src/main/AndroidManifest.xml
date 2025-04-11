@@ -13,6 +13,7 @@
     </queries>
 
     <application
+        android:name=".EpubApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -46,21 +47,7 @@
             android:label="@string/settings_title"
             android:parentActivityName=".MainActivity" />
             
-        <activity
-            android:name=".TestActivity"
-            android:exported="false"
-            android:label="EPUB Image Test"
-            android:parentActivityName=".MainActivity" />
-            
-        <activity
-            android:name=".LocalTestActivity"
-            android:exported="true"
-            android:label="Local EPUB Image Test">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <!-- Test activities removed -->
             
         <!-- FileProvider for sharing files -->
         <provider

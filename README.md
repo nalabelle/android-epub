@@ -22,10 +22,11 @@ A minimalist Android application that converts web content to EPUB format. Simpl
 
 This app is built using:
 
-- Kotlin
+- Kotlin for the Android UI
 - Android Jetpack components
-- Epublib for EPUB creation
-- Jsoup for HTML parsing
+- Rust for the EPUB conversion core functionality
+- UniFFI for Rust-Android integration
+- http-epub Rust library for web content processing
 
 ## Permissions
 
@@ -36,9 +37,28 @@ The app requires the following permissions:
 
 ## Building the Project
 
+### Prerequisites
+
+- Rust toolchain (rustup)
+- Android NDK
+- Android SDK
+- Cargo NDK (`cargo install cargo-ndk`)
+
+### Setup
+
 1. Clone the repository
-2. Open the project in Android Studio
-3. Build and run the app on your device or emulator
+2. Run `./setup-android.sh` to set up the Android NDK and Rust targets
+3. Run `./build-rust.sh` to build the Rust library
+4. Run `./build-android.sh` to generate the Kotlin bindings and build the Android app
+
+### Project Structure
+
+- `native/hub/`: Rust code for the EPUB conversion
+  - `src/hub.udl`: UniFFI interface definition
+  - `src/lib.rs`: Rust implementation
+- `app/`: Android application code
+  - `src/main/java/com/example/androidepub/generated/`: Generated UniFFI bindings
+  - `src/main/jniLibs/`: Native libraries for different architectures
 
 ## License
 

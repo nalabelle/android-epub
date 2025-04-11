@@ -1,0 +1,22 @@
+[package]
+name = "hub"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+uniffi = { version = "0.26", features = ["cli"] }
+tokio = { version = "1.36.0", features = ["rt-multi-thread", "macros"] }
+anyhow = "1.0"
+thiserror = "1.0"
+tempfile = "3.10.0"
+http-epub = { git = "https://github.com/nalabelle/http-epub" }
+
+[build-dependencies]
+uniffi = { version = "0.26", features = ["build"] }
+
+[[bin]]
+name = "uniffi-bindgen"
+path = "uniffi-bindgen.rs"

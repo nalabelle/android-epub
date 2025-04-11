@@ -8,10 +8,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.androidepub.utils.EpubCreator
+import uniffi.hub.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class MainViewModel : ViewModel() {
     
@@ -34,6 +35,9 @@ class MainViewModel : ViewModel() {
         
         viewModelScope.launch {
             try {
+                // Create a data class to hold the result
+                data class ConversionResult(val success: Boolean, val filePath: String?, val message: String?)
+                
                 val result = withContext(Dispatchers.IO) {
                     // Get the document tree from the URI
                     val treeUri = DocumentsContract.buildDocumentUriUsingTree(
@@ -53,26 +57,82 @@ class MainViewModel : ViewModel() {
                     )
                     
                     epubUri?.let {
-                        val outputStream = context.contentResolver.openOutputStream(it)
-                        if (outputStream != null) {
-                            val result = outputStream.use { stream ->
-                                EpubCreator.createEpubFromUrl(url, stream)
-                            }
-                            if (result.success) {
-                                EpubCreator.Result(true, epubUri.toString(), result.message)
+                        // Create a temporary file to store the EPUB
+                        val tempFile = File(context.cacheDir, filename)
+                        
+                        try {
+                            // Call the Rust function to create the EPUB
+                            // The uniffi-generated function throws exceptions on error
+                            val epubBytes = createEpubFromUrl(url, null)
+                            
+                            // Convert UByte list to ByteArray
+                            val byteArray = epubBytes.map { it.toByte() }.toByteArray()
+                            
+                            // Write the bytes to a file
+                            tempFile.writeBytes(byteArray)
+                            
+                            // Copy the temporary file to the output URI
+                            val outputStream = context.contentResolver.openOutputStream(epubUri)
+                            if (outputStream != null) {
+                                outputStream.use { stream ->
+                                    tempFile.inputStream().use { input ->
+                                        input.copyTo(stream)
+                                    }
+                                }
+                                // Delete the temporary file
+                                tempFile.delete()
+                                ConversionResult(
+                                    success = true,
+                                    filePath = epubUri.toString(),
+                                    message = "EPUB created successfully"
+                                )
                             } else {
-                                // If there was an error, delete the empty file
+                                // Clean up if we couldn't open the output stream
+                                tempFile.delete()
                                 try {
                                     DocumentsContract.deleteDocument(context.contentResolver, epubUri)
                                 } catch (e: Exception) {
                                     // Ignore errors when trying to delete the file
                                 }
-                                result
+                                ConversionResult(
+                                    success = false,
+                                    filePath = null,
+                                    message = "Failed to open output stream"
+                                )
                             }
-                        } else {
-                            EpubCreator.Result(false, null, "Failed to open output stream")
+                        } catch (e: EpubException) {
+                            // Handle specific errors from Rust
+                            // If there was an error, delete the empty file
+                            tempFile.delete()
+                            try {
+                                DocumentsContract.deleteDocument(context.contentResolver, epubUri)
+                            } catch (deleteEx: Exception) {
+                                // Ignore errors when trying to delete the file
+                            }
+                            ConversionResult(
+                                success = false,
+                                filePath = null,
+                                message = e.message
+                            )
+                        } catch (e: Exception) {
+                            // Handle other exceptions
+                            tempFile.delete()
+                            try {
+                                DocumentsContract.deleteDocument(context.contentResolver, epubUri)
+                            } catch (deleteEx: Exception) {
+                                // Ignore errors when trying to delete the file
+                            }
+                            ConversionResult(
+                                success = false,
+                                filePath = null,
+                                message = "Error: ${e.message}"
+                            )
                         }
-                    } ?: EpubCreator.Result(false, null, "Failed to create output file")
+                    } ?: ConversionResult(
+                        success = false,
+                        filePath = null,
+                        message = "Failed to create output file"
+                    )
                 }
                 
                 if (result.success) {

@@ -1,0 +1,18 @@
+// Define the error type for EPUB creation
+[Error]
+enum EpubError {
+    "InvalidUrl",
+    "DownloadFailed",
+    "ProcessingFailed",
+    "FileSystemError"
+};
+
+namespace hub {
+    // Main function to convert URL to EPUB file
+    [Throws=EpubError]
+    string url_to_epub(string url, string output_path, optional string? title = null);
+    
+    // Function to convert URL directly to EPUB bytes
+    [Throws=EpubError]
+    sequence<u8> create_epub_from_url(string url, optional string? title = null);
+};

@@ -6,6 +6,7 @@ plugins {
 android {
     namespace = "com.example.androidepub"
     compileSdk = 35
+    ndkVersion = "26.2.11394342" // Version of the NDK we're using
 
     defaultConfig {
         applicationId = "com.example.androidepub"
@@ -15,6 +16,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        // Configure native library loading
+        ndk {
+            abiFilters.add("arm64-v8a")
+            abiFilters.add("x86_64")
+            abiFilters.add("armeabi-v7a")
+            abiFilters.add("x86")
+        }
     }
 
     buildTypes {
@@ -36,6 +45,56 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    
+    packaging {
+        resources {
+            excludes += listOf(
+                "META-INF/AL2.0",
+                "META-INF/LGPL2.1"
+            )
+        }
+    }
+}
+
+// Task to copy native libraries to jniLibs directory
+tasks.register("copyNativeLibs") {
+    doLast {
+        // Create the jniLibs directory if it doesn't exist
+        val jniLibsDir = file("${projectDir}/src/main/jniLibs")
+        if (!jniLibsDir.exists()) {
+            jniLibsDir.mkdirs()
+        }
+        
+        // Define the target architectures and their corresponding directories
+        val architectures = mapOf(
+            "arm64-v8a" to "aarch64-linux-android",
+            "armeabi-v7a" to "armv7-linux-androideabi",
+            "x86" to "i686-linux-android",
+            "x86_64" to "x86_64-linux-android"
+        )
+        
+        // Copy the native library for each architecture
+        architectures.forEach { (abi, _) ->
+            val targetDir = file("${jniLibsDir}/${abi}")
+            if (!targetDir.exists()) {
+                targetDir.mkdirs()
+            }
+            
+            // Copy the library from the Rust target directory
+            val sourceFile = file("${rootDir}/native/target/release/libhub.so")
+            if (sourceFile.exists()) {
+                sourceFile.copyTo(file("${targetDir}/libhub.so"), overwrite = true)
+                println("Copied libhub.so to ${targetDir}")
+            } else {
+                println("Warning: Source library not found at ${sourceFile}")
+            }
+        }
+    }
+}
+
+// Make the preBuild task depend on copyNativeLibs
+tasks.named("preBuild") {
+    dependsOn("copyNativeLibs")
 }
 
 dependencies {
@@ -53,21 +112,13 @@ dependencies {
     // Coroutines for asynchronous programming
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     
-    // Room for local database storage
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-    annotationProcessor("androidx.room:room-compiler:2.6.1")
+    // No database storage needed
     
-    // EPUB library - using Epublib for EPUB creation
-    implementation("com.positiondev.epublib:epublib-core:3.1") {
-        exclude(group = "org.slf4j", module = "slf4j-simple")
-        exclude(group = "xmlpull", module = "xmlpull")
-    }
-    implementation("org.slf4j:slf4j-android:1.7.36")
+    // Using UniFFI for Rust integration
+    implementation("net.java.dev.jna:jna:5.12.1")
+    implementation("net.java.dev.jna:jna-platform:5.12.1")
     
-    // HTML processing and readability
-    implementation("org.jsoup:jsoup:1.16.2")
-    implementation("org.apache.commons:commons-text:1.10.0")
+    // No HTML processing needed in Kotlin (handled by Rust)
     
     // Testing dependencies
     testImplementation("junit:junit:4.13.2")

@@ -94,3 +94,13 @@ ehthumbs.db
 
 # Test files
 test_epub/output/
+
+# Rust/Android specific
+target/
+native/target/
+app/src/main/jniLibs/
+app/src/main/java/com/example/androidepub/generated/
+
+# Project specific
+.windsurfrules
+CLAUDE.md
